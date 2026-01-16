@@ -1,0 +1,36 @@
+<launch>
+  <!-- Load IFC Building into Bullet World -->
+  
+  <!-- occupancy map -->
+  <include file="$(find iai_maps)/launch/map.launch" />
+  
+  <!-- Building URDF -->
+  <param name="building_description"
+         textfile="$(find ifc_tree_to_graph)/output/urdf/building.urdf"/>
+  
+  <!-- PR2 Robot URDF (needed for cram-bullet-world-tutorial) -->
+  <arg name="upload" default="true" />
+  <group if="$(arg upload)">
+    <param name="robot_description"
+           command="$(find xacro)/xacro
+                    '$(find pr2_description)/robots/pr2.urdf.xacro'"/>
+  </group>
+
+  <!-- PR2 IK solver -->
+  <include file="$(find pr2_arm_kinematics)/launch/pr2_ik_larm_node.launch" />
+  <include file="$(find pr2_arm_kinematics)/launch/pr2_ik_rarm_node.launch" />
+  
+  <!-- Static transform: place building in map frame -->
+  <node pkg="tf" type="static_transform_publisher" name="building_link_broadcaster"
+        args="0 0 0 0 0 0 /map /world 25">
+  </node>
+  
+  <!-- Robot state publisher for building -->
+  <node pkg="robot_state_publisher" type="robot_state_publisher"
+    name="building_state_publisher" output="screen">
+    <param name="tf_prefix" value="ifc_building"/>
+    <param name="publish_frequency" value="25"/>
+    <remap from="robot_description" to="building_description" />
+  </node>
+
+</launch>

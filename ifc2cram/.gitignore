@@ -1,0 +1,14 @@
+*.tab.c
+*.tab.h
+lex.yy.c
+
+*.o
+
+.vscode/*
+
+
+
+
+
+
+

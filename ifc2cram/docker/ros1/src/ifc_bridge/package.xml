@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>ifc_bridge</name>
+  <version>0.0.0</version>
+  <description>The ifc_bridge package parses IFC files and sends the spatial information to KnowRob via rosprolog.</description>
+
+  <maintainer email="your.email@example.com">Your Name</maintainer>
+  <license>TODO</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>roscpp</build_depend>
+  <exec_depend>roscpp</exec_depend>
+
+  <build_depend>rosprolog</build_depend>
+  <exec_depend>rosprolog</exec_depend>
+
+  <build_depend>geometry_msgs</build_depend>
+  <exec_depend>geometry_msgs</exec_depend>
+
+  <build_depend>flex</build_depend>
+  <build_depend>bison</build_depend>
+
+  <export>
+    <build_type>catkin</build_type>
+  </export>
+</package>

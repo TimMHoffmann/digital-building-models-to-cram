@@ -1,0 +1,2 @@
+cram_ifc_world:ifc_bridge:ifc_tree_to_graph
+-DCATKIN_DEVEL_PREFIX=/root/cram_ws/devel -DCMAKE_INSTALL_PREFIX=/root/cram_ws/install -G Unix Makefiles

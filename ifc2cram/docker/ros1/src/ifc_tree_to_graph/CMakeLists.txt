@@ -1,0 +1,29 @@
+cmake_minimum_required(VERSION 3.0.2)
+project(ifc_tree_to_graph)
+
+find_package(catkin REQUIRED COMPONENTS
+  rospy
+  std_msgs
+)
+
+catkin_package(
+  CATKIN_DEPENDS rospy std_msgs
+)
+
+include_directories(
+  ${catkin_INCLUDE_DIRS}
+)
+
+install(PROGRAMS
+  scripts/ifc_tree_to_graph_node.py
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
+install(DIRECTORY lisp/
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/lisp
+  FILES_MATCHING PATTERN "*.lisp"
+)
+
+install(FILES cram-ifc-building.asd
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+)

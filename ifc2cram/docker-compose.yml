@@ -1,0 +1,50 @@
+version: '3.8'
+
+networks:
+  ifc_net:
+    driver: bridge
+
+volumes:
+  mongodb_data:
+  ifc_source_code:
+  ros1_full_stack_ros1:
+    external: false
+
+
+services:
+  ros1_full_stack:
+    build:
+      context: .
+      dockerfile: ./docker/ros1/Dockerfile
+    container_name: ros1_full_stack
+    hostname: ros1_full_stack
+    environment:
+      - ROS_MASTER_URI=http://ros1_full_stack:11311
+      - DB_URI=mongodb://mongodb:27018/knowrob
+      - KNOWROB_MONGO_HOST=mongodb
+      - KNOWROB_MONGO_PORT=27018
+      - KNOWROB_MONGO_DB=knowrob 
+      - KNOWROB_MONGO_USER=knowrob
+      - KNOWROB_MONGO_PASSWORD=secret
+      - "DISPLAY=${DISPLAY}"
+    networks:
+      - ifc_net
+    volumes:
+      - ./files/ifc:/root/ifc_files
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+    privileged: true 
+    tty: true
+
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    hostname: mongodb
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: knowrob
+      MONGO_INITDB_ROOT_PASSWORD: secret
+    networks:
+      - ifc_net
+    volumes:
+      - mongodb_data:/data/db
+    ports:
+      - "27018:27017" 

@@ -1,0 +1,12 @@
+<launch>
+
+  <arg name="urdf_file" default="$(find ifc_tree_to_graph)/output/urdf/building.urdf" />
+  <arg name="gui" default="true" />
+  <param name="robot_description" command="cat $(arg urdf_file)" />
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
+  <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" if="$(arg gui)">
+    <param name="use_gui" value="$(arg gui)" />
+  </node>
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find ifc_tree_to_graph)/config/building_view.rviz" required="true" />
+  
+</launch>
