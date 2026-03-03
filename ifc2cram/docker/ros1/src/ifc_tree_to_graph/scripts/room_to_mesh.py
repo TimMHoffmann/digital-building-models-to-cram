@@ -360,38 +360,5 @@ class RoomMeshGenerator:
         mesh.export(str(output_path), file_type=format)
         print(f"Mesh exported to: {output_path}")
     
-    def create_urdf(self, mesh_filename: str, space_name: str, output_path: str):
-        """Create URDF file for the room mesh"""
-        urdf_content = f"""<?xml version="1.0"?>
-<robot name="room_{space_name}">
-  <link name="room_{space_name}_link">
-    <visual>
-      <geometry>
-        <mesh filename="package://$(find ifc_tree_to_graph)/meshes/{mesh_filename}" scale="1.0 1.0 1.0"/>
-      </geometry>
-      <material name="room_material">
-        <color rgba="0.8 0.8 0.8 1.0"/>
-      </material>
-    </visual>
-    <collision>
-      <geometry>
-        <mesh filename="package://$(find ifc_tree_to_graph)/meshes/{mesh_filename}" scale="1.0 1.0 1.0"/>
-      </geometry>
-    </collision>
-    <inertial>
-      <mass value="1.0"/>
-      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
-    </inertial>
-  </link>
-</robot>
-"""
-        
-        output_path = Path(output_path)
-        output_path.parent.mkdir(parents=True, exist_ok=True)
-        
-        with open(output_path, 'w') as f:
-            f.write(urdf_content)
-        
-        print(f"URDF exported to: {output_path}")
     
 

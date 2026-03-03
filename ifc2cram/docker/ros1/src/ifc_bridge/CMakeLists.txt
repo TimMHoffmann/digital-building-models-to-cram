@@ -32,6 +32,7 @@ add_executable(ifc_parser_node
     model/SpaceNode.cpp
     model/ElementNode.cpp
     model/SpaceBoundaryNode.cpp
+    model/RobotTask.cpp
 )
 
 target_link_libraries(ifc_parser_node

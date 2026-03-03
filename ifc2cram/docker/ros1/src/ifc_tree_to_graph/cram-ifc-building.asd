@@ -14,12 +14,11 @@
                cl-bullet
                cram-bullet-reasoning
                cram-bullet-reasoning-belief-state
-               cram-bullet-reasoning-utilities)
+               cram-bullet-reasoning-utilities
+               ifc_tree_to_graph-srv)
   
   :components
   ((:module "lisp"
     :components
     ((:file "package")
-     (:file "setup" :depends-on ("package"))
-     (:file "navigation" :depends-on ("package" "setup"))
-     (:file "ifc-building" :depends-on ("package" "setup"))))))
+     (:file "ifc-building" :depends-on ("package"))))))

@@ -24,7 +24,9 @@ def build_graph_from_rooms(json_obj: Dict[str, Any]) -> nx.Graph:
                 "columns": _safe_get(room, "columns", []),
                 "doors": _safe_get(room, "doors", []),
                 "connections": _safe_get(room, "connections", []),
+                "robot_tasks": _safe_get(room, "robot_tasks", []),
                 "raw": room
+                
             }
         }
         G.add_node(sid, **node_attrs)

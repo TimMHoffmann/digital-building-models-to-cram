@@ -54,4 +54,6 @@ private:
                           const std::unordered_map<std::string, const Entity*>& entById);
     void processBoundaries(const std::vector<const Entity*>& rels,
                            const std::unordered_map<std::string, const Entity*>& entById);
+    void processTasks(const std::vector<const Entity*>& rels,
+                      const std::unordered_map<std::string, const Entity*>& entById);
 };

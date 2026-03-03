@@ -6,12 +6,14 @@
 #include <memory>
 #include "ElementNode.hpp"
 #include "SpaceBoundaryNode.hpp"
+#include "RobotTask.hpp"
 
 class SpaceNode : public SpatialNode {
 public:
     std::vector<ElementNode*> elements;
     std::vector<std::unique_ptr<SpaceBoundaryNode>> boundaries;
     std::vector<std::string> connected_space_ids;
+    std::vector<RobotTask> robotTasks;
     SpaceNode(Entity* e, const std::string& id, const std::string& name);
 
      void addConnectedSpace(const std::string& other_id) {

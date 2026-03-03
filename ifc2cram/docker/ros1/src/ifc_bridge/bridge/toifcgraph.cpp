@@ -14,6 +14,7 @@
 #include "model/SpaceNode.hpp"
 #include "model/ElementNode.hpp"
 #include "model/SpaceBoundaryNode.hpp"
+#include "model/RobotTask.hpp"
 #include <std_msgs/String.h>
 #include "RoomGeometry.hpp"
 
@@ -127,6 +128,22 @@ static std::string serializeRoomsToJson(const std::unordered_map<std::string, Ro
             ss << "\"via_door\":" << (cn.via_door ? "true" : "false") << ",";
             ss << "\"via_virtual\":" << (cn.via_virtual ? "true" : "false");
             ss << "}";
+        }
+        ss << "],";
+
+        // robot tasks
+        ss << "\"robot_tasks\": [";
+        bool firstTask = true;
+        if (r.robotTasks) {
+            for (const auto &task : *r.robotTasks) {
+                if (!firstTask) ss << ",";
+                firstTask = false;
+                ss << "{";
+                ss << "\"task_name\":\"" << escapeJson(task.taskName) << "\",";
+                ss << "\"start_space_id\":\"" << escapeJson(task.startSpaceId) << "\",";
+                ss << "\"end_space_id\":\"" << escapeJson(task.endSpaceId) << "\"";
+                ss << "}";
+            }
         }
         ss << "]";
 

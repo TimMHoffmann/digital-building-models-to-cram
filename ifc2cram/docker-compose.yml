@@ -34,17 +34,3 @@ services:
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
     privileged: true 
     tty: true
-
-  mongodb:
-    image: mongo:latest
-    container_name: mongodb
-    hostname: mongodb
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: knowrob
-      MONGO_INITDB_ROOT_PASSWORD: secret
-    networks:
-      - ifc_net
-    volumes:
-      - mongodb_data:/data/db
-    ports:
-      - "27018:27017" 

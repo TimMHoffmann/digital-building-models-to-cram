@@ -1,6 +1,7 @@
 #include "SpatialTree.hpp"
 #include "SpatialTreeHelpers.cpp" 
 #include "Relations.hpp"
+#include "RobotTask.hpp"
 #include <iostream>
 #include <utility>    
 #include <algorithm> 
@@ -38,6 +39,7 @@ void SpatialTree::build(const std::vector<std::unique_ptr<Entity>>& entities) {
     std::vector<const Entity*> relAggregates;
     std::vector<const Entity*> relContained;
     std::vector<const Entity*> relBoundaries;
+    std::vector<const Entity*> relProperties;
 
     for (const auto& e : entities) {
         if (!e) continue;
@@ -69,6 +71,9 @@ void SpatialTree::build(const std::vector<std::unique_ptr<Entity>>& entities) {
         else if (isRelSpaceBoundary(*e)) {
             relBoundaries.push_back(e.get());
         }
+        else if (isRelDefinesByProperties(*e)) {
+            relProperties.push_back(e.get());
+        }
     }
 
     if (!root) {
@@ -99,6 +104,7 @@ void SpatialTree::build(const std::vector<std::unique_ptr<Entity>>& entities) {
     processAggregates(relAggregates);
     processContained(relContained, entById);
     processBoundaries(relBoundaries, entById);
+    processTasks(relProperties, entById);
 
     std::cout << "[build] Tree construction finished.\n";
 }
@@ -218,14 +224,12 @@ void SpatialTree::processContained(const std::vector<const Entity*>& rels,
     }
 }
 
-/**
- * @brief Verarbeitet die Raumgrenzen (IfcRelSpaceBoundary).
- */
+
+
 void SpatialTree::processBoundaries(const std::vector<const Entity*>& rels,
                                     const std::unordered_map<std::string, const Entity*>& entById) {
     if (!root) return;
 
-    // Hilfsfunktion zum Erstellen oder Abrufen eines ElementNode (Dupliziert aus processContained, da es lokal benötigt wird)
     auto getOrCreateElement = [&](const std::string& elemId) -> ElementNode* {
         auto it = elementById_.find(elemId);
         if (it != elementById_.end()) return it->second;
@@ -287,5 +291,81 @@ void SpatialTree::processBoundaries(const std::vector<const Entity*>& rels,
         }
 
         space->addBoundary(std::move(boundary));
+    }
+}
+
+void SpatialTree::processTasks(const std::vector<const Entity*>& rels,
+                               const std::unordered_map<std::string, const Entity*>& entById) {
+    if (!root) return;
+
+    for (const auto* rel : rels) {
+        // Check if this is a RobotTask relation by Name (Attribute 2)
+        std::string relName;
+        if (rel->params.size() > 2 && rel->params[2]) {
+            relName = rel->params[2]->value;
+        }
+        if (relName != "RobotTaskRelation") continue;
+
+        // IFCRELDEFINESBYPROPERTIES: Attribute 5 = RelatingPropertyDefinition
+        if (rel->params.size() <= 5 || !rel->params[5]) continue;
+        
+        const std::string& propSetId = rel->params[5]->value;
+        auto itPropSet = entById.find(propSetId);
+        if (itPropSet == entById.end() || itPropSet->second->type != "IFCPROPERTYSET") continue;
+        
+        const Entity* propSet = itPropSet->second;
+        // Check if this is a RobotTask PropertySet by name
+        std::string propSetName;
+        if (propSet->params.size() > 2 && propSet->params[2]) {
+            propSetName = propSet->params[2]->value;
+        }
+        if (propSetName.find("RobotTask") == std::string::npos) continue;
+
+        // Parse properties: RobotStartPoint and RobotEndPoint
+        std::string startSpaceId, endSpaceId;
+        if (propSet->params.size() > 4 && propSet->params[4]) {
+            const auto& propsNode = propSet->params[4];
+            if (!propsNode->children.empty()) {
+                for (const auto& propId_ptr : propsNode->children) {
+                    if (!propId_ptr) continue;
+                    const std::string& propId = propId_ptr->value;
+                    auto itProp = entById.find(propId);
+                    if (itProp == entById.end()) continue;
+                    const Entity* prop = itProp->second;
+                    
+                    if (prop->type != "IFCPROPERTYSINGLEVALUE" || prop->params.size() < 3) continue;
+                    
+                    std::string propName = prop->params[0] ? prop->params[0]->value : "";
+                    std::string propValue = prop->params[2] ? prop->params[2]->value : "";
+                    
+                    if (propName == "RobotStartPoint") startSpaceId = propValue;
+                    else if (propName == "RobotEndPoint") endSpaceId = propValue;
+                }
+            }
+        }
+
+        if (startSpaceId.empty() || endSpaceId.empty()) continue;
+
+        // Attribute 4 = RelatedObjects (the spaces this property is assigned to)
+        if (rel->params.size() <= 4 || !rel->params[4]) continue;
+        
+        if (!rel->params[4]->children.empty()) {
+            for (const auto& spaceId_ptr : rel->params[4]->children) {
+                if (!spaceId_ptr) continue;
+                const std::string& spaceId = spaceId_ptr->value;
+                auto itSpace = spaceById_.find(spaceId);
+                if (itSpace == spaceById_.end()) continue;
+                
+                SpaceNode* space = itSpace->second;
+                RobotTask task;
+                task.startSpaceId = startSpaceId;
+                task.endSpaceId = endSpaceId;
+                task.taskName = propSetName;
+                space->robotTasks.push_back(task);
+                
+                std::cout << "[Task] Added RobotTask '" << propSetName << "' to Space " 
+                          << space->id << " (" << startSpaceId << " -> " << endSpaceId << ")\n";
+            }
+        }
     }
 }

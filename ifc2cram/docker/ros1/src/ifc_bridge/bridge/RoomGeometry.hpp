@@ -3,6 +3,8 @@
 #include <vector>
 #include <array>
 #include <unordered_map>
+#include <memory>
+#include "model/RobotTask.hpp"
 
 struct BoundaryGeo {
     std::string id;
@@ -30,6 +32,7 @@ struct RoomGeometry {
     std::vector<BoundaryGeo> columns;
 
     std::vector<RoomConnection> connections;
+    std::shared_ptr<std::vector<RobotTask>> robotTasks;
 
     size_t numBoundaries() const { return boundaries.size(); }
     size_t numDoors() const { return doors.size(); }

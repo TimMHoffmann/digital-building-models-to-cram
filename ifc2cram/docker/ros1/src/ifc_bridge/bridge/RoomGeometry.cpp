@@ -62,6 +62,11 @@ std::unordered_map<std::string, RoomGeometry> buildAllRoomGeometries(const Spati
                     }
                 } // boundaries
 
+                // Copy robot tasks from SpaceNode
+                if (!space->robotTasks.empty()) {
+                    rg.robotTasks = std::make_shared<std::vector<RobotTask>>(space->robotTasks);
+                }
+
                 out[rg.space_id] = std::move(rg);
             } // spaces
         } // stories

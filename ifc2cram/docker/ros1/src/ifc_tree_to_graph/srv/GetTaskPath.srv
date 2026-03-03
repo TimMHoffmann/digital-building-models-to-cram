@@ -1,0 +1,10 @@
+string task_name
+---
+bool success
+string message
+string task_name
+string start_space_id
+string end_space_id
+string[] path_nodes
+string[] space_ids
+geometry_msgs/Point[] space_points

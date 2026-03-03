@@ -24,6 +24,7 @@ static std::vector<std::string> listChildren(const ParamNode* list) {
 bool isRelAggregates(const Entity& e) { return e.type == "IFCRELAGGREGATES"; }
 bool isRelContainedInSpatialStructure(const Entity& e) { return e.type == "IFCRELCONTAINEDINSPATIALSTRUCTURE"; }
 bool isRelSpaceBoundary(const Entity& e) { return e.type == "IFCRELSPACEBOUNDARY"; }
+bool isRelDefinesByProperties(const Entity& e) { return e.type == "IFCRELDEFINESBYPROPERTIES"; }
 
 
 std::optional<std::string> getRelatingId(const Entity& e) {

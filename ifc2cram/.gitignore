@@ -4,11 +4,21 @@ lex.yy.c
 
 *.o
 
-.vscode/*
+build/*
+Test/parser
+# Python
+__pycache__/
+*.py[cod]
+*.so
 
+# Virtual envs
+.venv/
+venv/
+.pyvenv/
+test/ifcopenshell/.venv/
+test/ifcopenshell/.pyenv/
 
+# Jupyter
+.ipynb_checkpoints/
 
-
-
-
-
+cram_ws_build/

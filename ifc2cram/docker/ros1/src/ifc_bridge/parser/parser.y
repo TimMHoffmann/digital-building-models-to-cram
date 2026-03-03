@@ -11,7 +11,7 @@
   #include <string>
   #include <vector>
   #include <memory>
-  #include <fstream>              // FIX 1: needed for std::ifstream
+  #include <fstream>              
   #include "model/Entity.hpp"
   #include "model/ParamNode.hpp"
 
@@ -67,7 +67,6 @@ statement:
 ;
 
 entities:
-      /* empty */
     | entities entity
 ;
 
@@ -81,7 +80,7 @@ entity:
 ;
 
 params:
-      /* empty */   { $$ = std::vector<std::unique_ptr<ParamNode>>(); }
+       { $$ = std::vector<std::unique_ptr<ParamNode>>(); }
     | param_list   { $$ = std::move($1); }
 ;
 
