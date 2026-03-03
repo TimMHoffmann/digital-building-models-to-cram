@@ -1,6 +1,6 @@
 # IFC2Cram
 Start the whole enviroment with docker-compose up --build
-## Probleme
+## Problem
 2. please activat for the container xhost +local: to get permission for screen forwarding
 
 
@@ -34,8 +34,16 @@ NetworkX-Graph (building_graph.gpickle)
 
 ---
 
-## Example-Workflow
-## Show whole generating process to get urdf
+# Example-Workflow
+Please enter the running container. The easiest way is to attach to it using Visual Studio Code.
+
+You need **three terminals**:
+- **Terminal 1:** run the `ifc_tree_to_graph` ROS node.
+- **Terminal 2:** first run the `ifc_parser`, then use the same terminal to start `building_bullet_world.launch`.
+- **Terminal 3:** run the REPL (`roslisp_repl --no-emacs`).
+
+## Part A: RViz-only display (URDF generation + visualization)
+### Show whole generating process to get urdf (First two steps have to be fullfilled for further processing in cram bullet world)
 1) Starting ros node to generate urdf
 ```bash
 rosrun ifc_tree_to_graph ifc_tree_to_graph_node.py
@@ -49,8 +57,8 @@ rosrun ifc_tree_to_graph ifc_tree_to_graph_node.py
 roslaunch ifc_tree_to_graph view_building.launch
 ```
 
-##
-## Show cram to urdf process
+## Part B: URDF in Bullet World + start tasks / spawn robot
+### Show cram to urdf process
 1) Ensure the catking_make is running
 ```bash
  catkin_make -DPython3_EXECUTABLE=/usr/bin/python3 \
@@ -66,7 +74,7 @@ source devel/setup.bash && roslaunch ifc_tree_to_graph building_bullet_world.lau
 3) Start emacs
 ```bash 
 cd /root/cram_ws
-source devel/setup.bash && roslisp_repl
+source /opt/ros/noetic/setup.bash && source /root/cram_ws/devel/setup.bash && roslisp_repl --no-emacs
 ```
 
 
@@ -97,7 +105,24 @@ source devel/setup.bash && roslisp_repl
 (prolog:prolog '(and (btr:bullet-world ?world) 
                      (btr:debug-window ?world)))
 
+;; load requirements for tasks
+(asdf:load-system :roslisp)
+(asdf:load-system :cram-bullet-reasoning)
+(asdf:load-system :cram-ifc-building)
 
+;; call task
+
+(in-package :btr)
+	(multiple-value-bind (ok msg task start-id end-id path space-ids points)
+	    (ifc-tree-to-graph:get-task-path "RobotTask1")
+	  (unless ok (error msg))
+	  (format t "~&Task: ~a (~a -> ~a)~%" task start-id end-id)
+	  (format t "~&Punkte: ~a~%" (length (coerce points 'list)))
+	  (dolist (p (coerce points 'list))
+	    (let ((x (roslisp:msg-slot-value p 'x))
+	          (y (roslisp:msg-slot-value p 'y))
+	          (z (roslisp:msg-slot-value p 'z)))
+	      (format t "~&  (~a, ~a, ~a)~%" x y z))))
 
 ;; spawn a robot
 
